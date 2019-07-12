@@ -94,8 +94,12 @@ class PMMLContext(object):
         """Shuts down the :class:`GatewayClient` and the
            :class:`CallbackServer <py4j.java_callback.CallbackServer>`.
         """
-        if PMMLContext._gateway:
-            PMMLContext._gateway.shutdown()
+        with PMMLContext._lock:
+            if PMMLContext._gateway:
+                PMMLContext._gateway.shutdown()
+            PMMLContext._gateway = None
+            PMMLContext._jvm = None
+            PMMLContext._active_pmml_context = None
 
 
 class PmmlError(Exception):
@@ -111,7 +115,8 @@ class JavaModelWrapper(object):
         self._java_model = java_model
 
     def __del__(self):
-        self._pc._gateway.detach(self._java_model)
+        if self._pc._gateway:
+            self._pc._gateway.detach(self._java_model)
 
     def call(self, name, *a):
         return call_java_func(getattr(self._java_model, name), *a)
