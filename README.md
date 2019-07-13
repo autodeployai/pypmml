@@ -1,6 +1,6 @@
 # PyPMML
 
-_PyPMML_ is the Python API for [PMML4S](https://github.com/autodeployai/pmml4s).
+_PyPMML_ is a Python PMML scoring library, it really is the Python API for [PMML4S](https://github.com/autodeployai/pmml4s).
 
 ## Prerequisites
  - Java >= 1.8
