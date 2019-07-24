@@ -83,7 +83,7 @@ class PMMLContext(object):
             path.join(path.dirname(path.abspath(__file__)), 'jars')
         launch_classpath = path.join(jars_dir, "*")
 
-        _port = launch_gateway(classpath=launch_classpath)
+        _port = launch_gateway(classpath=launch_classpath, die_on_exit=True)
         gateway = JavaGateway(
             gateway_parameters=GatewayParameters(port=_port,
                                                  auto_convert=True))
