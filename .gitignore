@@ -7,4 +7,5 @@
 **/*.pyc
 /MANIFEST
 /.history/
+/.pytest_cache/
 
