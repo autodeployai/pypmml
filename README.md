@@ -83,14 +83,11 @@ pip install --upgrade git+https://github.com/autodeployai/pypmml.git
     [150 rows x 6 columns]
     ```
 
-3. Shutdown the gateway of Py4J to free resources.
-
-    ```python
-    Model.close()
-    ```
-
 ## Use in PySpark
 See the [PyPMML-Spark](https://github.com/autodeployai/pypmml-spark) project.
+
+## Deploy PMML as REST API
+See the [DaaS](https://www.autodeploy.ai/) system that deploys AI & ML models in production at scale on Kubernetes.
 
 ## Support
 If you have any questions about the _PyPMML_ library, please open issues on this repository.
