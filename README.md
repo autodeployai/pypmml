@@ -38,17 +38,17 @@ pip install --upgrade git+https://github.com/autodeployai/pypmml.git
     # data in dict
     result = model.predict({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2})
      >>> print(result)
-    {'Probability': 1.0, 'Node_ID': '1', 'Probability_Iris-virginica': 0.0, 'Probability_Iris-setosa': 1.0, 'Probability_Iris-versicolor': 0.0, 'PredictedValue': 'Iris-setosa'}
+    {'probability': 1.0, 'node_id': '1', 'probability_Iris-virginica': 0.0, 'probability_Iris-setosa': 1.0, 'probability_Iris-versicolor': 0.0, 'predicted_class': 'Iris-setosa'}
     
     # data in 'records' json
     result = model.predict('[{"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}]')
      >>> print(result)
-    [{"Probability":1.0,"Probability_Iris-versicolor":0.0,"Probability_Iris-setosa":1.0,"Probability_Iris-virginica":0.0,"PredictedValue":"Iris-setosa","Node_ID":"1"}]
+    [{"probability":1.0,"probability_Iris-versicolor":0.0,"probability_Iris-setosa":1.0,"probability_Iris-virginica":0.0,"predicted_class":"Iris-setosa","node_id":"1"}]
  
     # data in 'split' json
     result = model.predict('{"columns": ["sepal_length", "sepal_width", "petal_length", "petal_width"], "data": [[5.1, 3.5, 1.4, 0.2]]}')
      >>> print(result)
-    {"columns":["PredictedValue","Probability","Probability_Iris-setosa","Probability_Iris-versicolor","Probability_Iris-virginica","Node_ID"],"data":[["Iris-setosa",1.0,1.0,0.0,0.0,"1"]]}
+    {"columns":["predicted_class","probability","probability_Iris-setosa","probability_Iris-versicolor","probability_Iris-virginica","node_id"],"data":[["Iris-setosa",1.0,1.0,0.0,0.0,"1"]]}
     ```
 
     How to work with Pandas
@@ -59,12 +59,12 @@ pip install --upgrade git+https://github.com/autodeployai/pypmml.git
     # data in Series
     result = model.predict(pd.Series({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2}))
     >>> print(result)
-    Node_ID                                  1
-    PredictedValue                 Iris-setosa
-    Probability                              1
-    Probability_Iris-setosa                  1
-    Probability_Iris-versicolor              0
-    Probability_Iris-virginica               0
+    node_id                                   1
+    predicted_class                 Iris-setosa
+    probability                               1
+    probability_Iris-setosa                   1
+    probability_Iris-versicolor               0
+    probability_Iris-virginica                0
     Name: 0, dtype: object
     
     # The data is from here: http://dmg.org/pmml/pmml_examples/Iris.csv
@@ -73,12 +73,12 @@ pip install --upgrade git+https://github.com/autodeployai/pypmml.git
     # data in DataFrame
     result = model.predict(data)
      >>> print(result)
-        Node_ID   PredictedValue  Probability  Probability_Iris-setosa  Probability_Iris-versicolor  Probability_Iris-virginica
-    0         1      Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
-    1         1      Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
-    ..      ...              ...          ...                      ...                          ...                         ...
-    148      10   Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
-    149      10   Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
+        node_id   predicted_class  probability  probability_Iris-setosa  probability_Iris-versicolor  probability_Iris-virginica
+    0         1       Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
+    1         1       Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
+    ..      ...               ...          ...                      ...                          ...                         ...
+    148      10    Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
+    149      10    Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
     
     [150 rows x 6 columns]
     ```
