@@ -83,8 +83,14 @@ pip install --upgrade git+https://github.com/autodeployai/pypmml.git
     [150 rows x 6 columns]
     ```
 
-## Use in PySpark
-See the [PyPMML-Spark](https://github.com/autodeployai/pypmml-spark) project.
+## Use PMML in Scala or Java
+See the [PMML4S](https://github.com/autodeployai/pmml4s) project. _PMML4S_ a PMML scoring library for Scala. It provides both Scala and Java Evaluator API for PMML.
+
+## Use PMML in Spark
+See the [PMML4S-Spark](https://github.com/autodeployai/pmml4s-spark) project. _PMML4S-Spark_ is a PMML scoring library for Spark as SparkML Transformer.
+
+## Use PMML in PySpark
+See the [PyPMML-Spark](https://github.com/autodeployai/pypmml-spark) project. _PyPMML-Spark_ is a Python PMML scoring library for PySpark as SparkML Transformer, it really is the Python API for PMML4s-Spark.
 
 ## Deploy PMML as REST API
 See the [DaaS](https://www.autodeploy.ai/) system that deploys AI & ML models in production at scale on Kubernetes.
