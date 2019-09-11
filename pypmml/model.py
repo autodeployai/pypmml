@@ -139,9 +139,9 @@ class Model(JavaModelWrapper):
                     result = self.call('predict', record)
                     return pd.DataFrame.from_records([result]).iloc[0]
                 else:
-                    raise PmmlError('Data type "{type}" not supported'.foramt(type=type(data).__name__))
+                    raise PmmlError('Data type "{type}" not supported'.format(type=type(data).__name__))
             except ImportError:
-                raise PmmlError('Data type "{type}" not supported'.foramt(type=type(data).__name__))
+                raise PmmlError('Data type "{type}" not supported'.format(type=type(data).__name__))
             except Exception as e:
                 raise PmmlError('An error occurred caused by {message}'.format(message=str(e)))
 
