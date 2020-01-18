@@ -100,6 +100,26 @@ class ModelTestCase(TestCase):
         # Shutdown the gateway
         Model.close()
 
+    def test_load(self):
+        file_path = './resources/models/single_iris_dectree.xml'
+        self.assertTrue(Model.load(file_path) is not None)
+
+        with open(file_path, 'rb') as f:
+            self.assertTrue(Model.load(f) is not None)
+
+        with open(file_path) as f:
+            self.assertTrue(Model.load(f) is not None)
+
+        with open(file_path, 'rb') as f:
+            s = f.read()
+            self.assertTrue(Model.load(s) is not None)
+            s = bytearray(s)
+            self.assertTrue(Model.load(s) is not None)
+
+        with open(file_path) as f:
+            s = f.read()
+            self.assertTrue(Model.load(s) is not None)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 
+import os
 from py4j.protocol import Py4JJavaError
 
 from pypmml.base import JavaModelWrapper, PMMLContext, PmmlError
@@ -177,6 +178,27 @@ class Model(JavaModelWrapper):
         except Py4JJavaError as e:
             je = e.java_exception
             raise PmmlError(je.getClass().getSimpleName(), je.getMessage())
+
+    @classmethod
+    def load(cls, f):
+        """Load a model from PMML in any formats of readable, a file path, a string,
+        or an array of bytes(bytes or bytearray)"""
+        model_content = f
+        if hasattr(f, 'read') and callable(f.read):
+            model_content = f.read()
+
+        if isinstance(model_content, (bytes, bytearray)):
+            model_content = model_content.decode('utf-8')
+
+        if isinstance(model_content, str):
+            # Check if a file path
+            if os.path.exists(model_content):
+                model = cls.fromFile(model_content)
+            else:
+                model = cls.fromString(model_content)
+            return model
+        else:
+            raise PmmlError('Input type "{type}" not supported'.foramt(type=type(f).__name__))
 
     @classmethod
     def close(cls):
