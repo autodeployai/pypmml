@@ -23,13 +23,13 @@ pip install --upgrade git+https://github.com/autodeployai/pypmml.git
 ```
 
 ## Usage
-1. Load model from various sources, e.g. filename, string, or array of bytes.
+1. Load model from various sources, e.g. readable, file path, string, or an array of bytes.
 
     ```python
     from pypmml import Model
     
     # The model is from http://dmg.org/pmml/pmml_examples/KNIME_PMML_4.1_Examples/single_iris_dectree.xml
-    model = Model.fromFile('single_iris_dectree.xml')
+    model = Model.load('single_iris_dectree.xml')
     ```
 
 2. Call `predict(data)` to predict new values that can be in different types, e.g. dict, json, Series or DataFrame of Pandas.
