@@ -1,6 +1,7 @@
 **/__pycache__/
 /.idea/
 /.project
+/.settings/
 /build
 /dist
 **/.DS_Store
