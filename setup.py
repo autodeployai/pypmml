@@ -21,11 +21,11 @@ setup(
     },
     # include_package_data=True,
     install_requires=[
-        "py4j"
+        "py4j>=0.10.7"
     ],
     url="https://github.com/autodeployai/pypmml",
     download_url = "https://github.com/autodeployai/pypmml/archive/v" + VERSION + ".tar.gz",
-    author="AutoDeploy AI",
+    author="AutoDeployAI",
     author_email="autodeploy.ai@gmail.com",
     license="Apache License 2.0",
     classifiers=[
