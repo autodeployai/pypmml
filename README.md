@@ -84,7 +84,7 @@ pip install --upgrade git+https://github.com/autodeployai/pypmml.git
     ```
 
 ## Use PMML in Scala or Java
-See the [PMML4S](https://github.com/autodeployai/pmml4s) project. _PMML4S_ a PMML scoring library for Scala. It provides both Scala and Java Evaluator API for PMML.
+See the [PMML4S](https://github.com/autodeployai/pmml4s) project. _PMML4S_ is a PMML scoring library for Scala. It provides both Scala and Java Evaluator API for PMML.
 
 ## Use PMML in Spark
 See the [PMML4S-Spark](https://github.com/autodeployai/pmml4s-spark) project. _PMML4S-Spark_ is a PMML scoring library for Spark as SparkML Transformer.
