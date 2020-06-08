@@ -53,7 +53,7 @@ class ModelTestCase(TestCase):
         self.assertEqual(targetFields[0].opType, 'nominal')
         self.assertEqual(model.classes, ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'])
 
-        self.assertEqual(model.outputNames, ['PredictedValue', 'Probability', 'Probability_Iris-setosa', 'Probability_Iris-versicolor', 'Probability_Iris-virginica', 'Node_ID'])
+        self.assertEqual(model.outputNames, ['predicted_class', 'probability', 'probability_Iris-setosa', 'probability_Iris-versicolor', 'probability_Iris-virginica', 'node_id'])
         outputFields = model.outputFields
         self.assertEqual(outputFields[0].feature, 'predictedValue')
         self.assertEqual(outputFields[1].feature, 'probability')
@@ -68,34 +68,38 @@ class ModelTestCase(TestCase):
 
         # Data in dict
         result = model.predict({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2})
-        self.assertEqual(result['PredictedValue'], 'Iris-setosa')
-        self.assertEqual(result['Probability'], 1.0)
-        self.assertEqual(result['Node_ID'], '1')
+        self.assertEqual(result['predicted_class'], 'Iris-setosa')
+        self.assertEqual(result['probability'], 1.0)
+        self.assertEqual(result['node_id'], '1')
 
         result = model.predict({'sepal_length': 7, 'sepal_width': 3.2, 'petal_length': 4.7, 'petal_width': 1.4})
-        self.assertEqual(result['PredictedValue'], 'Iris-versicolor')
-        self.assertEqual(result['Probability'], 0.9074074074074074)
-        self.assertEqual(result['Node_ID'], '3')
+        self.assertEqual(result['predicted_class'], 'Iris-versicolor')
+        self.assertEqual(result['probability'], 0.9074074074074074)
+        self.assertEqual(result['node_id'], '3')
 
         # Data in json
         result = model.predict('[{"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}]')
-        self.assertEqual(result, '[{"Probability":1.0,"Probability_Iris-versicolor":0.0,"Probability_Iris-setosa":1.0,"Probability_Iris-virginica":0.0,"PredictedValue":"Iris-setosa","Node_ID":"1"}]')
+        self.assertEqual(result, '[{"node_id":"1","probability_Iris-setosa":1.0,"predicted_class":"Iris-setosa","probability_Iris-virginica":0.0,"probability_Iris-versicolor":0.0,"probability":1.0}]')
 
         result = model.predict('{"columns": ["sepal_length", "sepal_width", "petal_length", "petal_width"], "data": [[7, 3.2, 4.7, 1.4]]}')
-        self.assertEqual(result, '{"columns":["PredictedValue","Probability","Probability_Iris-setosa","Probability_Iris-versicolor","Probability_Iris-virginica","Node_ID"],"data":[["Iris-versicolor",0.9074074074074074,0.0,0.9074074074074074,0.09259259259259259,"3"]]}')
+        self.assertEqual(result, '{"columns":["predicted_class","probability","probability_Iris-setosa","probability_Iris-versicolor","probability_Iris-virginica","node_id"],"data":[["Iris-versicolor",0.9074074074074074,0.0,0.9074074074074074,0.09259259259259259,"3"]]}')
 
         # Data in Series
         result = model.predict(pd.Series({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2}))
-        self.assertEqual(result.get('PredictedValue'), 'Iris-setosa')
-        self.assertEqual(result.get('Probability'), 1.0)
-        self.assertEqual(result.get('Node_ID'), '1')
+        self.assertEqual(result.get('predicted_class'), 'Iris-setosa')
+        self.assertEqual(result.get('probability'), 1.0)
+        self.assertEqual(result.get('node_id'), '1')
 
         # Data in DataFrame
         data = pd.read_csv('./resources/data/Iris.csv')
         result = model.predict(data)
-        self.assertEqual(result.iloc[0].get('PredictedValue'), 'Iris-setosa')
-        self.assertEqual(result.iloc[0].get('Probability'), 1.0)
-        self.assertEqual(result.iloc[0].get('Node_ID'), '1')
+        self.assertEqual(result.iloc[0].get('predicted_class'), 'Iris-setosa')
+        self.assertEqual(result.iloc[0].get('probability'), 1.0)
+        self.assertEqual(result.iloc[0].get('node_id'), '1')
+
+        # Data in list
+        result = model.predict([5.1, 3.5, 1.4, 0.2])
+        print(result)
 
         # Shutdown the gateway
         Model.close()
@@ -123,3 +127,4 @@ class ModelTestCase(TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

@@ -117,6 +117,31 @@ class Model(JavaModelWrapper):
         """The class labels in a classification model."""
         return self.call('classes')
 
+    def setSupplementOutput(self, value):
+        self.call('setSupplementOutput', value)
+        return self
+
+    def _is_nd_array(self, data):
+        try:
+            import numpy as np
+            return isinstance(data, np.ndarray)
+        except ImportError:
+            return False
+
+    def _is_pandas_dataframe(self, data):
+        try:
+            import pandas as pd
+            return isinstance(data, pd.DataFrame)
+        except ImportError:
+            return False
+
+    def _is_pandas_series(self, data):
+        try:
+            import pandas as pd
+            return isinstance(data, pd.Series)
+        except ImportError:
+            return False
+
     def predict(self, data):
         """
         Predict values for a given data.
@@ -129,22 +154,30 @@ class Model(JavaModelWrapper):
         if isinstance(data, (dict, str, u"".__class__)):
             return self.call('predict', data)
         else:
-            try:
-                import pandas as pd
-                if isinstance(data, pd.DataFrame):
-                    records = data.to_dict('records')
-                    results = [self.call('predict', record) for record in records]
-                    return pd.DataFrame.from_records(results)
-                elif isinstance(data, pd.Series):
-                    record = data.to_dict()
-                    result = self.call('predict', record)
-                    return pd.DataFrame.from_records([result]).iloc[0]
+            if self._is_nd_array(data):
+                data = data.tolist()
+
+            if isinstance(data, list):
+                if data:
+                    record = data[0]
+                    if isinstance(record, list):
+                        return [self.call('predict', record) for record in data]
+                    else:
+                        return self.call('predict', data)
                 else:
-                    raise PmmlError('Data type "{type}" not supported'.format(type=type(data).__name__))
-            except ImportError:
+                    return []
+            elif self._is_pandas_dataframe(data):
+                import pandas as pd
+                records = data.to_dict('records')
+                results = [self.call('predict', record) for record in records]
+                return pd.DataFrame.from_records(results)
+            elif self._is_pandas_series(data):
+                import pandas as pd
+                record = data.to_dict()
+                result = self.call('predict', record)
+                return pd.DataFrame.from_records([result]).iloc[0]
+            else:
                 raise PmmlError('Data type "{type}" not supported'.format(type=type(data).__name__))
-            except Exception as e:
-                raise PmmlError('An error occurred caused by {message}'.format(message=str(e)))
 
     @classmethod
     def fromFile(cls, name):
