@@ -17,8 +17,6 @@
 import unittest
 from unittest import TestCase
 
-import pandas as pd
-
 from pypmml import Model
 
 
@@ -39,32 +37,32 @@ class ModelTestCase(TestCase):
         self.assertEqual(model.algorithmName, None)
 
         self.assertEqual(model.inputNames, ['sepal_length', 'sepal_width', 'petal_length', 'petal_width'])
-        inputFields = model.inputFields
-        self.assertEqual(len(inputFields), 4)
-        self.assertEqual(inputFields[0].name, 'sepal_length')
-        self.assertEqual(inputFields[0].dataType, 'double')
-        self.assertEqual(inputFields[0].opType, 'continuous')
+        inputs = model.inputFields
+        self.assertEqual(len(inputs), 4)
+        self.assertEqual(inputs[0].name, 'sepal_length')
+        self.assertEqual(inputs[0].dataType, 'double')
+        self.assertEqual(inputs[0].opType, 'continuous')
 
         self.assertEqual(model.targetNames, ['class'])
-        targetFields = model.targetFields
-        self.assertEqual(len(targetFields), 1)
-        self.assertEqual(targetFields[0].name, 'class')
-        self.assertEqual(targetFields[0].dataType, 'string')
-        self.assertEqual(targetFields[0].opType, 'nominal')
+        targets = model.targetFields
+        self.assertEqual(len(targets), 1)
+        self.assertEqual(targets[0].name, 'class')
+        self.assertEqual(targets[0].dataType, 'string')
+        self.assertEqual(targets[0].opType, 'nominal')
         self.assertEqual(model.classes, ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'])
 
         self.assertEqual(model.outputNames, ['predicted_class', 'probability', 'probability_Iris-setosa', 'probability_Iris-versicolor', 'probability_Iris-virginica', 'node_id'])
-        outputFields = model.outputFields
-        self.assertEqual(outputFields[0].feature, 'predictedValue')
-        self.assertEqual(outputFields[1].feature, 'probability')
-        self.assertEqual(outputFields[1].value, None)
-        self.assertEqual(outputFields[2].feature, 'probability')
-        self.assertEqual(outputFields[2].value, 'Iris-setosa')
-        self.assertEqual(outputFields[3].feature, 'probability')
-        self.assertEqual(outputFields[3].value, 'Iris-versicolor')
-        self.assertEqual(outputFields[4].feature, 'probability')
-        self.assertEqual(outputFields[4].value, 'Iris-virginica')
-        self.assertEqual(outputFields[5].feature, 'entityId')
+        outputs = model.outputFields
+        self.assertEqual(outputs[0].feature, 'predictedValue')
+        self.assertEqual(outputs[1].feature, 'probability')
+        self.assertEqual(outputs[1].value, None)
+        self.assertEqual(outputs[2].feature, 'probability')
+        self.assertEqual(outputs[2].value, 'Iris-setosa')
+        self.assertEqual(outputs[3].feature, 'probability')
+        self.assertEqual(outputs[3].value, 'Iris-versicolor')
+        self.assertEqual(outputs[4].feature, 'probability')
+        self.assertEqual(outputs[4].value, 'Iris-virginica')
+        self.assertEqual(outputs[5].feature, 'entityId')
 
         # Data in dict
         result = model.predict({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2})
@@ -84,25 +82,88 @@ class ModelTestCase(TestCase):
         result = model.predict('{"columns": ["sepal_length", "sepal_width", "petal_length", "petal_width"], "data": [[7, 3.2, 4.7, 1.4]]}')
         self.assertEqual(result, '{"columns":["predicted_class","probability","probability_Iris-setosa","probability_Iris-versicolor","probability_Iris-virginica","node_id"],"data":[["Iris-versicolor",0.9074074074074074,0.0,0.9074074074074074,0.09259259259259259,"3"]]}')
 
-        # Data in Series
-        result = model.predict(pd.Series({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2}))
-        self.assertEqual(result.get('predicted_class'), 'Iris-setosa')
-        self.assertEqual(result.get('probability'), 1.0)
-        self.assertEqual(result.get('node_id'), '1')
-
-        # Data in DataFrame
-        data = pd.read_csv('./resources/data/Iris.csv')
-        result = model.predict(data)
-        self.assertEqual(result.iloc[0].get('predicted_class'), 'Iris-setosa')
-        self.assertEqual(result.iloc[0].get('probability'), 1.0)
-        self.assertEqual(result.iloc[0].get('node_id'), '1')
-
         # Data in list
         result = model.predict([5.1, 3.5, 1.4, 0.2])
-        print(result)
+        self.assertEqual(result[0], 'Iris-setosa')
+        self.assertEqual(result[1], 1.0)
+        self.assertEqual(result[2], 1.0)
+        self.assertEqual(result[3], 0.0)
+        self.assertEqual(result[4], 0.0)
+        self.assertEqual(result[5], '1')
+
+        # Data in list of list
+        result = model.predict([[5.1, 3.5, 1.4, 0.2], [7, 3.2, 4.7, 1.4]])
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0][0], 'Iris-setosa')
+        self.assertEqual(result[0][1], 1.0)
+        self.assertEqual(result[0][2], 1.0)
+        self.assertEqual(result[0][3], 0.0)
+        self.assertEqual(result[0][4], 0.0)
+        self.assertEqual(result[0][5], '1')
+        self.assertEqual(result[1][0], 'Iris-versicolor')
+        self.assertEqual(result[1][1], 0.9074074074074074)
+        self.assertEqual(result[1][2], 0.0)
+        self.assertEqual(result[1][3], 0.9074074074074074)
+        self.assertEqual(result[1][4], 0.09259259259259259)
+        self.assertEqual(result[1][5], '3')
+
+        # Data in numpy
 
         # Shutdown the gateway
         Model.close()
+
+    def test_pandas(self):
+        try:
+            import pandas as pd
+            model = Model.load('./resources/models/single_iris_dectree.xml')
+
+            # Data in Series
+            result = model.predict(pd.Series({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2}))
+            self.assertEqual(result.get('predicted_class'), 'Iris-setosa')
+            self.assertEqual(result.get('probability'), 1.0)
+            self.assertEqual(result.get('node_id'), '1')
+
+            # Data in DataFrame
+            data = pd.read_csv('./resources/data/Iris.csv')
+            result = model.predict(data)
+            self.assertEqual(result.iloc[0].get('predicted_class'), 'Iris-setosa')
+            self.assertEqual(result.iloc[0].get('probability'), 1.0)
+            self.assertEqual(result.iloc[0].get('node_id'), '1')
+        except ImportError:
+            pass
+
+    def test_numpy(self):
+        try:
+            import numpy as np
+            model = Model.load('./resources/models/single_iris_dectree.xml')
+
+            # Data in 1-D
+            result = model.predict(np.array([5.1, 3.5, 1.4, 0.2]))
+            self.assertEqual(result[0], 'Iris-setosa')
+            self.assertEqual(result[1], 1.0)
+            self.assertEqual(result[2], 1.0)
+            self.assertEqual(result[3], 0.0)
+            self.assertEqual(result[4], 0.0)
+            self.assertEqual(result[5], '1')
+
+            # Data in 2-D
+            result = model.predict(np.array([[5.1, 3.5, 1.4, 0.2], [7, 3.2, 4.7, 1.4]]))
+            self.assertEqual(len(result), 2)
+            self.assertEqual(result[0][0], 'Iris-setosa')
+            self.assertEqual(result[0][1], 1.0)
+            self.assertEqual(result[0][2], 1.0)
+            self.assertEqual(result[0][3], 0.0)
+            self.assertEqual(result[0][4], 0.0)
+            self.assertEqual(result[0][5], '1')
+            self.assertEqual(result[1][0], 'Iris-versicolor')
+            self.assertEqual(result[1][1], 0.9074074074074074)
+            self.assertEqual(result[1][2], 0.0)
+            self.assertEqual(result[1][3], 0.9074074074074074)
+            self.assertEqual(result[1][4], 0.09259259259259259)
+            self.assertEqual(result[1][5], '3')
+
+        except ImportError:
+            pass
 
     def test_load(self):
         file_path = './resources/models/single_iris_dectree.xml'
@@ -127,4 +188,5 @@ class ModelTestCase(TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
 

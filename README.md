@@ -7,8 +7,7 @@ _PyPMML_ is a Python PMML scoring library, it really is the Python API for [PMML
  - Python 2.7 or >= 3.5
 
 ## Dependencies
-  - Py4J
-  - Pandas (optional)
+  - [Py4J](https://www.py4j.org/)
   
 ## Installation
 
@@ -32,55 +31,86 @@ pip install --upgrade git+https://github.com/autodeployai/pypmml.git
     model = Model.load('single_iris_dectree.xml')
     ```
 
-2. Call `predict(data)` to predict new values that can be in different types, e.g. dict, json, Series or DataFrame of Pandas.
+2. Call `predict(data)` to predict new values that can be in different types, e.g. dict, list, json, ndarray of NumPy, Series or DataFrame of Pandas.
+
+    * **`data` in dict:**
 
     ```python
-    # data in dict
-    result = model.predict({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2})
-     >>> print(result)
-    {'probability': 1.0, 'node_id': '1', 'probability_Iris-virginica': 0.0, 'probability_Iris-setosa': 1.0, 'probability_Iris-versicolor': 0.0, 'predicted_class': 'Iris-setosa'}
+    >>> model.predict({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2})
+    {'probability_Iris-setosa': 1.0, 'probability_Iris-versicolor': 0.0, 'probability': 1.0, 'predicted_class': 'Iris-setosa', 'probability_Iris-virginica': 0.0, 'node_id': '1'}
+    ```
+
+    * **`data` in list:** 
     
-    # data in 'records' json
-    result = model.predict('[{"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}]')
-     >>> print(result)
+    NOTE: the order of values must match the input names, and the order of results always matches the output names.
+
+    ```python
+    >>> model.inputNames
+    ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+    >>> model.predict([5.1, 3.5, 1.4, 0.2])
+    ['Iris-setosa', 1.0, 1.0, 0.0, 0.0, '1']
+    >>> model.outputNames
+    ['predicted_class', 'probability', 'probability_Iris-setosa', 'probability_Iris-versicolor', 'probability_Iris-virginica', 'node_id']
+    ```
+    
+    * **`data` in `records` json:**
+
+    ```python
+    >>> model.predict('[{"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}]')
     [{"probability":1.0,"probability_Iris-versicolor":0.0,"probability_Iris-setosa":1.0,"probability_Iris-virginica":0.0,"predicted_class":"Iris-setosa","node_id":"1"}]
+    ```
+
+    * **`data` in `split` json:**
  
-    # data in 'split' json
-    result = model.predict('{"columns": ["sepal_length", "sepal_width", "petal_length", "petal_width"], "data": [[5.1, 3.5, 1.4, 0.2]]}')
-     >>> print(result)
+    ```python
+    >>> model.predict('{"columns": ["sepal_length", "sepal_width", "petal_length", "petal_width"], "data": [[5.1, 3.5, 1.4, 0.2]]}')
     {"columns":["predicted_class","probability","probability_Iris-setosa","probability_Iris-versicolor","probability_Iris-virginica","node_id"],"data":[["Iris-setosa",1.0,1.0,0.0,0.0,"1"]]}
     ```
 
-    How to work with Pandas
+    * **`data` in ndarray of NumPy:**
+
+    NOTE: as the list above, the order of ndarray values must match the input names, and the order of results always matches the output names.
+    ```python
+    >>> import numpy as np
+    >>> model.predict(np.array([5.1, 3.5, 1.4, 0.2]))
+    ['Iris-setosa', 1.0, 1.0, 0.0, 0.0, '1']
+    >>> 
+    >>> model.predict(np.array([[5.1, 3.5, 1.4, 0.2], [7, 3.2, 4.7, 1.4]]))
+    [['Iris-setosa', 1.0, 1.0, 0.0, 0.0, '1'], ['Iris-versicolor', 0.9074074074074074, 0.0, 0.9074074074074074, 0.09259259259259259, '3']]
+    ```
+
+    * **`data` in Series of Pandas:**
     
     ```python
-    import pandas as pd
-    
-    # data in Series
-    result = model.predict(pd.Series({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2}))
-    >>> print(result)
-    node_id                                   1
-    predicted_class                 Iris-setosa
-    probability                               1
-    probability_Iris-setosa                   1
-    probability_Iris-versicolor               0
-    probability_Iris-virginica                0
+    >>> import pandas as pd
+    >>> model.predict(pd.Series({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2}))
+    node_id                                  1
+    predicted_class                Iris-setosa
+    probability                              1
+    probability_Iris-setosa                  1
+    probability_Iris-versicolor              0
+    probability_Iris-virginica               0
     Name: 0, dtype: object
-    
-    # The data is from here: http://dmg.org/pmml/pmml_examples/Iris.csv
-    data = pd.read_csv('Iris.csv')
-    
-    # data in DataFrame
-    result = model.predict(data)
-     >>> print(result)
-        node_id   predicted_class  probability  probability_Iris-setosa  probability_Iris-versicolor  probability_Iris-virginica
-    0         1       Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
-    1         1       Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
-    ..      ...               ...          ...                      ...                          ...                         ...
-    148      10    Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
-    149      10    Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
-    
-    [150 rows x 6 columns]
+    ```
+
+    * **`data` in DataFrame of Pandas:**
+
+    ```python
+    >>> import pandas as pd
+    >>> data = pd.read_csv('Iris.csv') # The data is from here: http://dmg.org/pmml/pmml_examples/Iris.csv
+    >>> model.predict(data)
+    node_id predicted_class  probability  probability_Iris-setosa  probability_Iris-versicolor  probability_Iris-virginica
+    0         1     Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
+    1         1     Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
+    2         1     Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
+    3         1     Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
+    4         1     Iris-setosa     1.000000                      1.0                     0.000000                    0.000000
+    ..      ...             ...          ...                      ...                          ...                         ...
+    145      10  Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
+    146      10  Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
+    147      10  Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
+    148      10  Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
+    149      10  Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
     ```
 
 ## Use PMML in Scala or Java

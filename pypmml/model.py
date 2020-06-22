@@ -154,9 +154,6 @@ class Model(JavaModelWrapper):
         if isinstance(data, (dict, str, u"".__class__)):
             return self.call('predict', data)
         else:
-            if self._is_nd_array(data):
-                data = data.tolist()
-
             if isinstance(data, list):
                 if data:
                     record = data[0]
@@ -166,11 +163,19 @@ class Model(JavaModelWrapper):
                         return self.call('predict', data)
                 else:
                     return []
+            elif self._is_nd_array(data):
+                import numpy as np
+                if data.ndim == 1:
+                    return self.call('predict', data.tolist())
+                elif data.ndim == 2:
+                    return [self.call('predict', record.tolist()) for record in data]
+                else:
+                    raise PmmlError('Max 2 dimensions are supported')            
             elif self._is_pandas_dataframe(data):
                 import pandas as pd
                 records = data.to_dict('records')
-                results = [self.call('predict', record) for record in records]
-                return pd.DataFrame.from_records(results)
+                result = [self.call('predict', record) for record in records]
+                return pd.DataFrame.from_records(result)
             elif self._is_pandas_series(data):
                 import pandas as pd
                 record = data.to_dict()
