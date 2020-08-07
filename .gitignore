@@ -4,6 +4,7 @@
 /.settings/
 /build
 /dist
+/pypmml.egg-info
 **/.DS_Store
 **/*.pyc
 /MANIFEST
