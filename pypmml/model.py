@@ -228,7 +228,7 @@ class Model(JavaModelWrapper):
         if isinstance(model_content, (bytes, bytearray)):
             model_content = model_content.decode('utf-8')
 
-        if isinstance(model_content, str):
+        if isinstance(model_content, (str, u"".__class__)):
             # Check if a file path
             if os.path.exists(model_content):
                 model = cls.fromFile(model_content)
@@ -236,7 +236,7 @@ class Model(JavaModelWrapper):
                 model = cls.fromString(model_content)
             return model
         else:
-            raise PmmlError('Input type "{type}" not supported'.foramt(type=type(f).__name__))
+            raise PmmlError('Input type "{type}" not supported'.format(type=type(f).__name__))
 
     @classmethod
     def close(cls):
