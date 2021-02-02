@@ -78,12 +78,24 @@ class PMMLContext(object):
             return PMMLContext._active_pmml_context
 
     @classmethod
-    def launch_gateway(cls):
+    def launch_gateway(cls, javaopts=[], java_path=None):
+        """Launch a `Gateway` in a new Java process.
+        :param javaopts: an array of extra options to pass to Java (the classpath
+            should be specified using the `classpath` parameter, not `javaopts`.)
+        :param java_path: If None, Py4J will use $JAVA_HOME/bin/java if $JAVA_HOME
+            is defined, otherwise it will use "java".
+        :return: An object of `Gateway`
+        """
         jars_dir = os.environ["PYPMML_JARS_DIR"] if "PYPMML_JARS_DIR" in os.environ else \
             path.join(path.dirname(path.abspath(__file__)), 'jars')
         launch_classpath = path.join(jars_dir, "*")
 
-        _port = launch_gateway(classpath=launch_classpath, die_on_exit=True)
+        if not javaopts:
+            java_opts = os.environ.get("JAVA_OPTS")
+            if java_opts:
+                javaopts = java_opts.split()
+
+        _port = launch_gateway(classpath=launch_classpath, javaopts=javaopts, java_path=java_path, die_on_exit=True)
         gateway = JavaGateway(
             gateway_parameters=GatewayParameters(port=_port,
                                                  auto_convert=True))
