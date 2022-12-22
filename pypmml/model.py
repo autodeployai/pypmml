@@ -168,14 +168,21 @@ class Model(JavaModelWrapper):
                 if data.ndim == 1:
                     return self.call('predict', data.tolist())
                 elif data.ndim == 2:
-                    return [self.call('predict', record.tolist()) for record in data]
+                    try:
+                        import pandas as pd
+                        data = pd.DataFrame(data, columns=self.inputNames)
+                        json_data = data.to_json(orient='split', index=False)
+                        result = self.call('predict', json_data)
+                        return pd.read_json(result, orient='split').values
+                    except:
+                        return [self.call('predict', record.tolist()) for record in data]
                 else:
                     raise PmmlError('Max 2 dimensions are supported')            
             elif self._is_pandas_dataframe(data):
                 import pandas as pd
-                records = data.to_dict('records')
-                result = [self.call('predict', record) for record in records]
-                return pd.DataFrame.from_records(result)
+                json_data = data.to_json(orient='split', index=False)
+                result = self.call('predict', json_data)
+                return pd.read_json(result, orient='split')
             elif self._is_pandas_series(data):
                 import pandas as pd
                 record = data.to_dict()
