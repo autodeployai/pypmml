@@ -95,6 +95,10 @@ class PMMLContext(object):
             if java_opts:
                 javaopts = java_opts.split()
 
+        # Fix IllegalAccessError: cannot access class jdk.internal.math.FloatingDecimal
+        javaopts.append("--add-exports")
+        javaopts.append("java.base/jdk.internal.math=ALL-UNNAMED")
+
         _port = launch_gateway(classpath=launch_classpath, javaopts=javaopts, java_path=java_path, die_on_exit=True)
         gateway = JavaGateway(
             gateway_parameters=GatewayParameters(port=_port,

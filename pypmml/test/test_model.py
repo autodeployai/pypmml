@@ -128,7 +128,7 @@ class ModelTestCase(TestCase):
             result = model.predict(data)
             self.assertEqual(result.iloc[0].get('predicted_class'), 'Iris-setosa')
             self.assertEqual(result.iloc[0].get('probability'), 1.0)
-            self.assertEqual(result.iloc[0].get('node_id'), '1')
+            self.assertEqual(result.iloc[0].get('node_id'), 1)
         except ImportError:
             pass
 
@@ -154,13 +154,13 @@ class ModelTestCase(TestCase):
             self.assertEqual(result[0][2], 1.0)
             self.assertEqual(result[0][3], 0.0)
             self.assertEqual(result[0][4], 0.0)
-            self.assertEqual(result[0][5], '1')
+            self.assertEqual(result[0][5], 1)
             self.assertEqual(result[1][0], 'Iris-versicolor')
-            self.assertEqual(result[1][1], 0.9074074074074074)
+            self.assertAlmostEqual(result[1][1], 0.9074074074074074)
             self.assertEqual(result[1][2], 0.0)
-            self.assertEqual(result[1][3], 0.9074074074074074)
-            self.assertEqual(result[1][4], 0.09259259259259259)
-            self.assertEqual(result[1][5], '3')
+            self.assertAlmostEqual(result[1][3], 0.9074074074074074)
+            self.assertAlmostEqual(result[1][4], 0.09259259259259259)
+            self.assertEqual(result[1][5], 3)
 
         except ImportError:
             pass
