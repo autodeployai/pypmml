@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017-2019 AutoDeploy AI
+# Copyright (c) 2017-2024 AutoDeployAI
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 #
 
 import os
-from py4j.protocol import Py4JJavaError
 
-from pypmml.base import JavaModelWrapper, PMMLContext, PmmlError
+from pypmml.base import JavaModelWrapper, PMMLContext
+from pypmml.jvm import PMMLError
 from pypmml.elements import Header
 from pypmml.metadata import Field, OutputField, DataDictionary
 
@@ -177,7 +177,7 @@ class Model(JavaModelWrapper):
                     except:
                         return [self.call('predict', record.tolist()) for record in data]
                 else:
-                    raise PmmlError('Max 2 dimensions are supported')            
+                    raise PMMLError('Max 2 dimensions are supported')
             elif self._is_pandas_dataframe(data):
                 import pandas as pd
                 json_data = data.to_json(orient='split', index=False)
@@ -189,40 +189,28 @@ class Model(JavaModelWrapper):
                 result = self.call('predict', record)
                 return pd.DataFrame.from_records([result]).iloc[0]
             else:
-                raise PmmlError('Data type "{type}" not supported'.format(type=type(data).__name__))
+                raise PMMLError('Data type "{type}" not supported'.format(type=type(data).__name__))
 
     @classmethod
     def fromFile(cls, name):
         """Load a model from PMML file with given pathname"""
         pc = PMMLContext.getOrCreate()
-        try:
-            java_model = pc._jvm.org.pmml4s.model.Model.fromFile(name)
-            return cls(java_model)
-        except Py4JJavaError as e:
-            je = e.java_exception
-            raise PmmlError(je.getClass().getSimpleName(), je.getMessage())
+        java_model = pc.call_java_static_func("org.pmml4s.model.Model", "fromFile", name)
+        return cls(java_model)
 
     @classmethod
     def fromString(cls, s):
         """Load a model from PMML in a string"""
         pc = PMMLContext.getOrCreate()
-        try:
-            java_model = pc._jvm.org.pmml4s.model.Model.fromString(s)
-            return cls(java_model)
-        except Py4JJavaError as e:
-            je = e.java_exception
-            raise PmmlError(je.getClass().getSimpleName(), je.getMessage())
+        java_model = pc.call_java_static_func("org.pmml4s.model.Model", "fromString", s)
+        return cls(java_model)
 
     @classmethod
     def fromBytes(cls, bytes_array):
         """Load a model from PMML in an array of bytes"""
         pc = PMMLContext.getOrCreate()
-        try:
-            java_model = pc._jvm.org.pmml4s.model.Model.fromBytes(bytes_array)
-            return cls(java_model)
-        except Py4JJavaError as e:
-            je = e.java_exception
-            raise PmmlError(je.getClass().getSimpleName(), je.getMessage())
+        java_model = pc.call_java_static_func("org.pmml4s.model.Model", "fromBytes", bytes_array)
+        return cls(java_model)
 
     @classmethod
     def load(cls, f):
@@ -243,9 +231,9 @@ class Model(JavaModelWrapper):
                 model = cls.fromString(model_content)
             return model
         else:
-            raise PmmlError('Input type "{type}" not supported'.format(type=type(f).__name__))
+            raise PMMLError('Input type "{type}" not supported'.format(type=type(f).__name__))
 
     @classmethod
     def close(cls):
-        """Shutdown the gateway of Py4J"""
+        """Shutdown the gateway of JVM"""
         PMMLContext.shutdown()

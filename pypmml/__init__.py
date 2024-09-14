@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017-2019 AutoDeploy AI
+# Copyright (c) 2017-2024 AutoDeployAI
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ PyPMML is the Python API for PMML4S.
 """
 
 from pypmml.model import Model
-from pypmml.base import PmmlError
+from pypmml.jvm import PMMLError
+from pypmml.base import PMMLContext
 from pypmml.version import __version__
 
-__all__ = ['Model', 'PmmlError']
+__all__ = ['Model', 'PMMLError', 'PMMLContext']

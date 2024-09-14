@@ -21,7 +21,7 @@ setup(
     },
     # include_package_data=True,
     install_requires=[
-        "py4j>=0.10.7"
+        "py4j>=0.10.7", "JPype1"
     ],
     url="https://github.com/autodeployai/pypmml",
     download_url = "https://github.com/autodeployai/pypmml/archive/v" + VERSION + ".tar.gz",

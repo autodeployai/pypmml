@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017-2019 AutoDeploy AI
+# Copyright (c) 2017-2024 AutoDeployAI
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import unittest
 from unittest import TestCase
 
-from pypmml import Model
+from pypmml import Model, PMMLContext
 
 
 class ModelTestCase(TestCase):
@@ -185,6 +185,13 @@ class ModelTestCase(TestCase):
             s = f.read()
             self.assertTrue(Model.load(s) is not None)
 
+    def test_jpype(self):
+        PMMLContext.getOrCreate(gateway="jpype")
+        self.assertEqual(PMMLContext.gateway(), "JPype")
+        self.test_from_file()
+        self.test_pandas()
+        self.test_numpy()
+        self.test_load()
 
 if __name__ == '__main__':
     unittest.main()
