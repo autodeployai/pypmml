@@ -114,6 +114,13 @@ pip install --upgrade git+https://github.com/autodeployai/pypmml.git
     148      10  Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
     149      10  Iris-virginica     0.978261                      0.0                     0.021739                    0.978261
     ```
+## Support Java gateways
+PyPMML supports both backends access to Java from Python: "py4j" and "jpype", `Py4j` is used by default, you can call the following code to switch to `jpype` before loading models:
+```python
+from pypmml import PMMLContext
+
+PMMLContext.getOrCreate(gateway="jpype")
+```
 
 ## Use PMML in Scala or Java
 See the [PMML4S](https://github.com/autodeployai/pmml4s) project. _PMML4S_ is a PMML scoring library for Scala. It provides both Scala and Java Evaluator API for PMML.
