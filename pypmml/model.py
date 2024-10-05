@@ -170,19 +170,21 @@ class Model(JavaModelWrapper):
                 elif data.ndim == 2:
                     try:
                         import pandas as pd
+                        from io import StringIO
                         data = pd.DataFrame(data, columns=self.inputNames)
                         json_data = data.to_json(orient='split', index=False)
                         result = self.call('predict', json_data)
-                        return pd.read_json(result, orient='split').values
+                        return pd.read_json(StringIO(result), orient='split').values
                     except:
                         return [self.call('predict', record.tolist()) for record in data]
                 else:
                     raise PMMLError('Max 2 dimensions are supported')
             elif self._is_pandas_dataframe(data):
                 import pandas as pd
+                from io import StringIO
                 json_data = data.to_json(orient='split', index=False)
                 result = self.call('predict', json_data)
-                return pd.read_json(result, orient='split')
+                return pd.read_json(StringIO(result), orient='split')
             elif self._is_pandas_series(data):
                 import pandas as pd
                 record = data.to_dict()
