@@ -29,7 +29,7 @@ setup(
     author_email="autodeploy.ai@gmail.com",
     license="Apache License 2.0",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
