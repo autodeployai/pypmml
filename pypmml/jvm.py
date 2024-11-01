@@ -26,8 +26,7 @@ class JVMGateway(ABC):
         self.java_path = None
 
         # JVM options
-        # Fix IllegalAccessError: cannot access class jdk.internal.math.FloatingDecimal
-        self.java_opts = ["--add-exports=java.base/jdk.internal.math=ALL-UNNAMED"]
+        self.java_opts = []
         java_opts = os.environ.get("JAVA_OPTS")
         if java_opts:
             self.java_opts.extend(java_opts.split())
@@ -144,7 +143,7 @@ class JPypeGateway(JVMGateway):
 
 class Py4jGateway(JVMGateway):
     """Py4j"""
-    from py4j.java_collections import JavaArray
+    from py4j.java_collections import JavaArray, JavaList
     from py4j.java_gateway import JavaObject
     from py4j.protocol import Py4JJavaError
 
@@ -179,7 +178,7 @@ class Py4jGateway(JVMGateway):
         Py4jGateway._gateway.detach(java_object)
 
     def java2py(self, r):
-        if isinstance(r, self.JavaArray):
+        if isinstance(r, (self.JavaArray, self.JavaList)):
             return [self.java2py(x) for x in r]
         elif isinstance(r, self.JavaObject):
             cls_name = r.getClass().getName()

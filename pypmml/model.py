@@ -19,7 +19,8 @@ import os
 from pypmml.base import JavaModelWrapper, PMMLContext
 from pypmml.jvm import PMMLError
 from pypmml.elements import Header
-from pypmml.metadata import Field, OutputField, DataDictionary
+from pypmml.metadata import Field, OutputField, DataDictionary, DataVal
+from pypmml.utils import is_nd_array, is_pandas_series, is_pandas_dataframe
 
 
 class Model(JavaModelWrapper):
@@ -115,32 +116,12 @@ class Model(JavaModelWrapper):
     @property
     def classes(self):
         """The class labels in a classification model."""
-        return self.call('classes')
+        values = self.call('classes')
+        return [DataVal(x).toVal for x in values]
 
     def setSupplementOutput(self, value):
         self.call('setSupplementOutput', value)
         return self
-
-    def _is_nd_array(self, data):
-        try:
-            import numpy as np
-            return isinstance(data, np.ndarray)
-        except ImportError:
-            return False
-
-    def _is_pandas_dataframe(self, data):
-        try:
-            import pandas as pd
-            return isinstance(data, pd.DataFrame)
-        except ImportError:
-            return False
-
-    def _is_pandas_series(self, data):
-        try:
-            import pandas as pd
-            return isinstance(data, pd.Series)
-        except ImportError:
-            return False
 
     def predict(self, data):
         """
@@ -163,8 +144,7 @@ class Model(JavaModelWrapper):
                         return self.call('predict', data)
                 else:
                     return []
-            elif self._is_nd_array(data):
-                import numpy as np
+            elif is_nd_array(data):
                 if data.ndim == 1:
                     return self.call('predict', data.tolist())
                 elif data.ndim == 2:
@@ -179,13 +159,13 @@ class Model(JavaModelWrapper):
                         return [self.call('predict', record.tolist()) for record in data]
                 else:
                     raise PMMLError('Max 2 dimensions are supported')
-            elif self._is_pandas_dataframe(data):
+            elif is_pandas_dataframe(data):
                 import pandas as pd
                 from io import StringIO
                 json_data = data.to_json(orient='split', index=False)
                 result = self.call('predict', json_data)
                 return pd.read_json(StringIO(result), orient='split')
-            elif self._is_pandas_series(data):
+            elif is_pandas_series(data):
                 import pandas as pd
                 record = data.to_dict()
                 result = self.call('predict', record)

@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-
 #
-# Copyright (c) 2017-2024 AutoDeployAI
+# Copyright (c) 2024 AutoDeployAI
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +14,25 @@
 # limitations under the License.
 #
 
-# Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
-# 'X.Y.dev0' is the canonical version of 'X.Y.dev'
-__version__ = '1.5.3'
+def is_nd_array(data):
+    try:
+        import numpy as np
+        return isinstance(data, np.ndarray)
+    except ImportError:
+        return False
+
+
+def is_pandas_dataframe(data):
+    try:
+        import pandas as pd
+        return isinstance(data, pd.DataFrame)
+    except ImportError:
+        return False
+
+
+def is_pandas_series(data):
+    try:
+        import pandas as pd
+        return isinstance(data, pd.Series)
+    except ImportError:
+        return False

@@ -16,15 +16,19 @@
 
 import unittest
 from unittest import TestCase
+from os import path
 
 from pypmml import Model, PMMLContext
 
 
 class ModelTestCase(TestCase):
+    test_data_dir = path.join(path.dirname(__file__), 'resources', 'data')
+    test_models_dir = path.join(path.dirname(__file__), 'resources', 'models')
 
     def test_from_file(self):
         # The model is from here: http://dmg.org/pmml/pmml_examples/KNIME_PMML_4.1_Examples/single_iris_dectree.xml
-        model = Model.fromFile('./resources/models/single_iris_dectree.xml')
+        model_path = path.join(self.test_models_dir, 'single_iris_dectree.xml')
+        model = Model.fromFile(model_path)
         self.assertEqual(model.version, '4.1')
 
         app = model.header.application
@@ -115,7 +119,8 @@ class ModelTestCase(TestCase):
     def test_pandas(self):
         try:
             import pandas as pd
-            model = Model.load('./resources/models/single_iris_dectree.xml')
+            model_path = path.join(self.test_models_dir, 'single_iris_dectree.xml')
+            model = Model.load(model_path)
 
             # Data in Series
             result = model.predict(pd.Series({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2}))
@@ -124,7 +129,8 @@ class ModelTestCase(TestCase):
             self.assertEqual(result.get('node_id'), '1')
 
             # Data in DataFrame
-            data = pd.read_csv('./resources/data/Iris.csv')
+            data_path = path.join(self.test_data_dir, 'Iris.csv')
+            data = pd.read_csv(data_path)
             result = model.predict(data)
             self.assertEqual(result.iloc[0].get('predicted_class'), 'Iris-setosa')
             self.assertEqual(result.iloc[0].get('probability'), 1.0)
@@ -135,7 +141,8 @@ class ModelTestCase(TestCase):
     def test_numpy(self):
         try:
             import numpy as np
-            model = Model.load('./resources/models/single_iris_dectree.xml')
+            model_path = path.join(self.test_models_dir, 'single_iris_dectree.xml')
+            model = Model.load(model_path)
 
             # Data in 1-D
             result = model.predict(np.array([5.1, 3.5, 1.4, 0.2]))
@@ -166,7 +173,7 @@ class ModelTestCase(TestCase):
             pass
 
     def test_load(self):
-        file_path = './resources/models/single_iris_dectree.xml'
+        file_path = path.join(self.test_models_dir, 'single_iris_dectree.xml')
         self.assertTrue(Model.load(file_path) is not None)
 
         with open(file_path, 'rb') as f:

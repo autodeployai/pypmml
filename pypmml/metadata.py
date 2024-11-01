@@ -58,7 +58,11 @@ class OutputField(Field):
 
     @property
     def value(self):
-        return self.call('value')
+        obj = self.call('value')
+        if obj is not None:
+            return DataVal(obj).toVal
+        else:
+            return None
 
     @property
     def ruleFeature(self):
@@ -88,3 +92,12 @@ class DataDictionary(JavaModelWrapper):
     def get(self, name):
         fld = self.get(name)
         return Field(fld) if fld is not None else None
+
+
+class DataVal(JavaModelWrapper):
+    def __init__(self, java_model):
+        super(DataVal, self).__init__(java_model)
+
+    @property
+    def toVal(self):
+        return self.call('toVal')
